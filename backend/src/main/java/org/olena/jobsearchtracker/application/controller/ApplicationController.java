@@ -21,8 +21,8 @@ public class ApplicationController {
     }
 
     @GetMapping
-    public List<ApplicationResponse> list() {
-        return service.list().stream().map(ApplicationResponse::from).toList();
+    public List<ApplicationResponse> list(@RequestParam(required = false) Long companyId) {
+        return service.list(companyId).stream().map(ApplicationResponse::from).toList();
     }
 
     @GetMapping("/{id}")

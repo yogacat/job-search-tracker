@@ -25,8 +25,8 @@ public class ApplicationService {
         this.companyService = companyService;
     }
 
-    public List<Application> list() {
-        return repository.findAll();
+    public List<Application> list(Long companyId) {
+        return companyId != null ? repository.findByCompanyId(companyId) : repository.findAll();
     }
 
     public Application get(Long id) {
