@@ -3,6 +3,7 @@ package org.olena.jobsearchtracker.application.repository;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.Instant;
 import java.time.LocalDate;
@@ -11,6 +12,7 @@ import java.time.LocalDate;
 @Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
+@EntityListeners(AuditingEntityListener.class)
 @Table(name = "application_event")
 public class ApplicationEvent {
     @Id

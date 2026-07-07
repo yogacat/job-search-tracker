@@ -10,9 +10,6 @@ import org.olena.jobsearchtracker.application.repository.WorkMode;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-// PUT = full replace (same convention as Company's update): every editable field is
-// resent, including currentStatus -- until events drive it automatically, it's a plain
-// editable field here.
 public record UpdateApplicationRequest(
         @NotNull Long companyId,
         @NotBlank String roleTitle,

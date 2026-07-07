@@ -9,7 +9,6 @@ import org.olena.jobsearchtracker.application.repository.WorkMode;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-// currentStatus is not accepted here: every application starts APPLIED.
 public record CreateApplicationRequest(
         @NotNull Long companyId,
         @NotBlank String roleTitle,
