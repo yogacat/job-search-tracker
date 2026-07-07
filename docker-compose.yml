@@ -1,0 +1,38 @@
+services:
+  jobsearch-postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    # Loopback-only, non-default host port: lets a local IDE connect directly for
+    # inspection/debugging without exposing the DB on the LAN/Tailscale the way the backend's
+    # 0.0.0.0:8080 is exposed. 5434 (not 5432) because this machine already runs a native Postgres
+    # on the default port, and the Zalando app's container takes 5433.
+    ports:
+      - "127.0.0.1:5434:5432"
+
+  jobsearch-backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      jobsearch-postgres:
+        condition: service_healthy
+    env_file: .env
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://jobsearch-postgres:5432/${POSTGRES_DB}
+    # 8081 (not 8080) so it doesn't collide with the Zalando app's backend; the Spring app
+    # listens on 8081 (server.port) and the Dockerfile EXPOSEs 8081.
+    ports:
+      - "8081:8081"
+
+volumes:
+  pgdata:

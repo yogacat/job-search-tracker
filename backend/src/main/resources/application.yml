@@ -1,0 +1,26 @@
+spring:
+  application:
+    name: job-search-tracker
+  datasource:
+    # Default targets the Docker Postgres published on the host at 5434 (kept off 5432/5433 so it
+    # doesn't clash with a native Postgres or the Zalando app's container). In Docker this is
+    # overridden by SPRING_DATASOURCE_URL (jobsearch-postgres:5432) from docker-compose.
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5434/jobsearch_tracker}
+    username: ${POSTGRES_USER:jobsearch_tracker}
+    password: ${POSTGRES_PASSWORD:jobsearch_tracker}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+
+server:
+  port: 8081
+  servlet:
+    session:
+      cookie:
+        # Defense-in-depth alongside CSRF tokens; Lax (not Strict) so the session survives
+        # following a link into the app from elsewhere.
+        same-site: lax
