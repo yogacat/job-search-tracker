@@ -28,8 +28,23 @@ npm run dev        # http://localhost:5174
   (`Datum | Firma | Position | Art der Bewerbung | Status/Ergebnis | Link`) and downloads a CSV
   stand-in. The real backend streams a formatted `.xlsx` via Apache POI.
 
-## Suggested backend shape (for reference)
-- `JobApplication` + `ApplicationEvent` entities (see `frontend/src/types.ts` for fields).
-- `ApplicationStatusMachine` for legal transitions (`APPLIED → SCREENING → INTERVIEW → OFFER →
-  ACCEPTED`, with `REJECTED / WITHDRAWN / GHOSTED` reachable from anywhere).
-- `GET /api/applications/export.xlsx` — Apache POI, one row per application + a summary sheet.
+## Running the backend
+
+The backend is a Spring Boot app (Java 26) backed by Postgres, with schema migrations via Flyway.
+
+Start Postgres + backend together with Docker Compose:
+
+```bash
+docker compose up -d
+```
+
+This reads `.env` for `POSTGRES_USER` / `POSTGRES_PASSWORD` / `POSTGRES_DB`, and serves the API at
+`http://localhost:8081`.
+
+To run the backend locally from your IDE instead (against the same Dockerized Postgres):
+
+```bash
+docker compose up -d jobsearch-postgres   # Postgres only, published at localhost:5434
+cd backend
+./mvnw spring-boot:run
+```

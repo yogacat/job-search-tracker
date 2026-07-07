@@ -2,26 +2,30 @@ package org.olena.jobsearchtracker.application.service;
 
 import org.olena.jobsearchtracker.application.dto.CreateApplicationRequest;
 import org.olena.jobsearchtracker.application.dto.UpdateApplicationRequest;
-import org.olena.jobsearchtracker.application.repository.Application;
-import org.olena.jobsearchtracker.application.repository.ApplicationRepository;
-import org.olena.jobsearchtracker.application.repository.CurrentStatus;
-import org.olena.jobsearchtracker.application.repository.WorkMode;
+import org.olena.jobsearchtracker.application.repository.*;
 import org.olena.jobsearchtracker.common.NotFoundException;
 import org.olena.jobsearchtracker.company.repository.Company;
 import org.olena.jobsearchtracker.company.service.CompanyService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
 @Transactional(readOnly = true)
 public class ApplicationService {
     private final ApplicationRepository repository;
+    private final ApplicationEventRepository eventRepository;
     private final CompanyService companyService;
 
-    public ApplicationService(ApplicationRepository repository, CompanyService companyService) {
+    public ApplicationService(
+            ApplicationRepository repository,
+            ApplicationEventRepository eventRepository,
+            CompanyService companyService
+    ) {
         this.repository = repository;
+        this.eventRepository = eventRepository;
         this.companyService = companyService;
     }
 
@@ -51,13 +55,17 @@ public class ApplicationService {
                 CurrentStatus.APPLIED,
                 request.notes()
         );
-        return repository.save(application);
+        repository.save(application);
+        eventRepository.save(new ApplicationEvent(application, request.appliedOn(), EventType.APPLIED, null));
+
+        return application;
     }
 
     @Transactional
     public Application update(Long id, UpdateApplicationRequest request) {
         Application application = get(id);
         Company company = companyService.get(request.companyId());
+        CurrentStatus previousStatus = application.getCurrentStatus();
 
         application.setCompany(company);
         application.setRoleTitle(request.roleTitle());
@@ -71,6 +79,11 @@ public class ApplicationService {
         application.setSalaryPeriod(request.salaryPeriod());
         application.setCurrentStatus(request.currentStatus());
         application.setNotes(request.notes());
+
+        if (request.currentStatus() != previousStatus) {
+            EventType eventType = EventType.valueOf(request.currentStatus().name());
+            eventRepository.save(new ApplicationEvent(application, LocalDate.now(), eventType, null));
+        }
 
         return application;
     }
