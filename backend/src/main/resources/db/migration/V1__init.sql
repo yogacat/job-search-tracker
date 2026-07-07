@@ -14,14 +14,14 @@ CREATE TABLE application (
     role_title      TEXT        NOT NULL,
     posting_url     TEXT,
     location        TEXT,
-    work_mode       TEXT        CHECK (work_mode IN ('REMOTE', 'HYBRID', 'ONSITE', 'UNKNOWN')),
+    work_mode       TEXT        NOT NULL DEFAULT 'UNKNOWN'
+                      CHECK (work_mode IN ('REMOTE', 'HYBRID', 'ONSITE', 'UNKNOWN')),
     source          TEXT        NOT NULL
                       CHECK (source IN ('LINKEDIN', 'STEPSTONE', 'COMPANY_SITE', 'REFERRAL',
                                         'INDEED', 'XING', 'OTHER')),
     applied_on      DATE        NOT NULL,
     salary_min      NUMERIC(10, 2),
     salary_max      NUMERIC(10, 2),
-    salary_currency CHAR(3)     NOT NULL DEFAULT 'EUR',
     salary_period   TEXT        CHECK (salary_period IN ('YEAR', 'MONTH')),
     current_status  TEXT        NOT NULL DEFAULT 'APPLIED'
                       CHECK (current_status IN ('APPLIED', 'INTERVIEW', 'OFFER', 'ACCEPTED',

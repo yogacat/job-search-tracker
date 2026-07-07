@@ -32,7 +32,7 @@ public class CompanyService {
 
     public Company create(CreateCompanyRequest request) {
         Company company = new Company(
-               request.name(), request.website(), request.location(), request.notes());
+                request.name(), request.website(), request.location(), request.notes());
         return repository.save(company);
     }
 

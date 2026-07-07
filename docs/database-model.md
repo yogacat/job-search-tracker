@@ -18,6 +18,8 @@ same stack as the Zalando app). v1 = four tables: `company`, `application`, `app
 - **Timestamps** (`created_at` / `updated_at`) on every table via the `BaseEntity` +
   JPA auditing pattern (`@CreatedDate` / `@LastModifiedDate`), not DB triggers.
 - Child rows (`application_event`, `task`) `ON DELETE CASCADE`; `application → company` restricts.
+- **No salary currency column** — EUR-only (user's real usage), so salary is just `salary_min` /
+  `salary_max` / `salary_period`, no `salary_currency`.
 
 ## Enums
 
@@ -57,13 +59,13 @@ create table application (
     role_title      text        not null,
     posting_url     text,
     location        text,
-    work_mode       text        check (work_mode in ('REMOTE', 'HYBRID', 'ONSITE', 'UNKNOWN')),
+    work_mode       text        not null default 'UNKNOWN'
+                      check (work_mode in ('REMOTE', 'HYBRID', 'ONSITE', 'UNKNOWN')),
     source          text        not null
                       check (source in ('LINKEDIN', 'STEPSTONE', 'COMPANY_SITE', 'REFERRAL', 'INDEED', 'XING', 'OTHER')),
     applied_on      date        not null,
     salary_min      numeric(10, 2),
     salary_max      numeric(10, 2),
-    salary_currency char(3)     not null default 'EUR',
     salary_period   text        check (salary_period in ('YEAR', 'MONTH')),
     current_status  text        not null default 'APPLIED'
                       check (current_status in ('APPLIED', 'INTERVIEW', 'OFFER', 'ACCEPTED',
@@ -112,13 +114,6 @@ interface Company {
   location?: string | null;
 }
 
-interface Salary {
-  min?: number | null;
-  max?: number | null;
-  currency: string;        // "EUR"
-  period?: "YEAR" | "MONTH" | null;
-}
-
 interface ApplicationEvent {
   id: number;
   occurredOn: string;      // ISO date
@@ -142,7 +137,9 @@ interface Application {
   workMode?: "REMOTE" | "HYBRID" | "ONSITE" | "UNKNOWN" | null;
   source: "LINKEDIN" | "STEPSTONE" | "COMPANY_SITE" | "REFERRAL" | "INDEED" | "XING" | "OTHER";
   appliedOn: string;       // ISO date
-  salary?: Salary | null;
+  salaryMin?: number | null;
+  salaryMax?: number | null;
+  salaryPeriod?: "YEAR" | "MONTH" | null;  // EUR-only, so no currency field
   currentStatus: "APPLIED" | "INTERVIEW" | "OFFER" | "ACCEPTED" | "REJECTED" | "WITHDRAWN" | "GHOSTED";
   notes?: string | null;
   events: ApplicationEvent[];
