@@ -7,7 +7,7 @@ spring:
     # overridden by SPRING_DATASOURCE_URL (jobsearch-postgres:5432) from docker-compose.
     url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5434/jobsearch_tracker}
     username: ${POSTGRES_USER:jobsearch_tracker}
-    password: ${POSTGRES_PASSWORD:jobsearch_tracker}
+    password: ${POSTGRES_PASSWORD:local_dev_password}
   jpa:
     hibernate:
       ddl-auto: validate
