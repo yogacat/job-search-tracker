@@ -22,10 +22,9 @@ const CATEGORY: Record<string, NodeCategory> = {
   "Applied directly": "source",
   "Via recruiter": "source",
   "Total applications": "source",
-  "Phone screen": "stage",
-  "First interview": "stage",
-  "Second interview": "stage",
-  "Third interview": "stage",
+  "Interview 1": "stage",
+  "Interview 2": "stage",
+  "Interview 3": "stage",
   Offer: "offer",
   Accepted: "success",
   "No reply": "reject",
@@ -40,10 +39,9 @@ const ORDER = [
   "Via recruiter",
   "Total applications",
   "No reply",
-  "Phone screen",
-  "First interview",
-  "Second interview",
-  "Third interview",
+  "Interview 1",
+  "Interview 2",
+  "Interview 3",
   "Rejected",
   "Withdrew",
   "Offer",
@@ -51,7 +49,9 @@ const ORDER = [
   "Accepted",
 ];
 
-const INTERVIEW_NAMES = ["First interview", "Second interview", "Third interview"];
+// Short labels: with up to 6 sequential stages packed into one chart, "First/Second/Third
+// interview" ran long enough to overlap the next node's label at this chart's width.
+const INTERVIEW_NAMES = ["Interview 1", "Interview 2", "Interview 3"];
 // No node name contains a pipe, so it is a safe key delimiter (names contain spaces).
 const SEP = "|";
 
@@ -66,8 +66,8 @@ function terminalNode(app: JobApplication, reachedOffer: boolean): string | null
     case "ACCEPTED":
       return "Accepted";
     default:
-      // OFFER pending, or still in progress (APPLIED / SCREENING / INTERVIEW) - the flow just
-      // reaches the current stage and stops there.
+      // OFFER pending, or still in progress (APPLIED / INTERVIEW) - the flow just reaches the
+      // current stage and stops there.
       return null;
   }
 }
@@ -78,9 +78,8 @@ function pathFor(app: JobApplication): string[] {
   path.push("Total applications");
 
   const types = app.events.map((e) => e.type);
-  if (types.includes("SCREENING_CALL")) path.push("Phone screen");
 
-  const interviews = types.filter((t) => t === "INTERVIEW").length;
+  const interviews = types.filter((t) => t === "INTERVIEW" || t === "TECHNICAL_INTERVIEW").length;
   for (let k = 0; k < Math.min(interviews, INTERVIEW_NAMES.length); k++) path.push(INTERVIEW_NAMES[k]);
 
   const reachedOffer = types.includes("OFFER") || app.status === "OFFER" || app.status === "ACCEPTED";

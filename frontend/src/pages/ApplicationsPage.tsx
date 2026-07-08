@@ -4,7 +4,6 @@ import {
   Button,
   Card,
   CardContent,
-  Divider,
   Link as MuiLink,
   Stack,
   Typography,
@@ -13,11 +12,11 @@ import {
 import AddIcon from "@mui/icons-material/Add";
 import { Link } from "react-router-dom";
 import { useStore } from "../store";
-import { ACTIVE_STATUSES, type JobApplication } from "../types";
+import { ACTIVE_STATUSES, SOURCE_LABEL, STATUS_ORDER, type JobApplication } from "../types";
 import { StatusChip, SoftChip } from "../chips";
 import { rowAccentKey } from "../accent";
 import { barColor } from "../palette";
-import { formatDate, relativeDay, daysUntil } from "../format";
+import { formatDate } from "../format";
 import { AddApplicationDialog } from "../components/AddApplicationDialog";
 
 function Stat({ label, value }: { label: string; value: number }) {
@@ -34,7 +33,7 @@ function Stat({ label, value }: { label: string; value: number }) {
 const WORK_MODE_LABEL: Record<string, string> = { REMOTE: "Remote", HYBRID: "Hybrid", ONSITE: "Onsite" };
 
 export function ApplicationsPage() {
-  const { applications } = useStore();
+  const { applications, loading, error } = useStore();
   const [addOpen, setAddOpen] = useState(false);
 
   const stats = useMemo(() => {
@@ -47,6 +46,15 @@ export function ApplicationsPage() {
       rejected: by("REJECTED") + by("GHOSTED") + by("WITHDRAWN"),
     };
   }, [applications]);
+
+  const sortedApplications = useMemo(
+    () =>
+      [...applications].sort((a, b) => {
+        const order = STATUS_ORDER.indexOf(a.status) - STATUS_ORDER.indexOf(b.status);
+        return order !== 0 ? order : b.appliedDate.localeCompare(a.appliedDate);
+      }),
+    [applications],
+  );
 
   return (
     <>
@@ -77,9 +85,15 @@ export function ApplicationsPage() {
         </CardContent>
       </Card>
 
-      {applications.map((app) => (
-        <ApplicationCard key={app.id} app={app} />
-      ))}
+      {error && (
+        <Typography color="error" variant="body2">
+          Couldn&apos;t load applications: {error}
+        </Typography>
+      )}
+      {!error && loading && <Typography color="text.secondary">Loading…</Typography>}
+      {!error &&
+        !loading &&
+        sortedApplications.map((app) => <ApplicationCard key={app.id} app={app} />)}
 
       <AddApplicationDialog open={addOpen} onClose={() => setAddOpen(false)} />
     </>
@@ -90,8 +104,6 @@ function ApplicationCard({ app }: { app: JobApplication }) {
   const mode = useTheme().palette.mode;
   const accentKey = rowAccentKey(app);
   const accent = accentKey ? barColor(mode, accentKey) : undefined;
-  const overdue = app.nextStepDate ? daysUntil(app.nextStepDate) < 0 : false;
-  const dueSoon = app.nextStepDate ? daysUntil(app.nextStepDate) >= 0 && daysUntil(app.nextStepDate) <= 3 : false;
 
   return (
     <Card sx={accent ? { borderLeft: `3px solid ${accent}` } : undefined}>
@@ -110,7 +122,7 @@ function ApplicationCard({ app }: { app: JobApplication }) {
                 {app.role}
               </Typography>
               <Typography variant="caption" sx={{ color: "text.secondary", display: "block", mt: 0.5 }}>
-                Applied {formatDate(app.appliedDate)} &middot; {app.source}
+                Applied {formatDate(app.appliedDate)} &middot; {SOURCE_LABEL[app.source]}
                 {app.location ? ` · ${app.location}` : ""}
               </Typography>
             </Box>
@@ -124,26 +136,6 @@ function ApplicationCard({ app }: { app: JobApplication }) {
             </Stack>
           </Stack>
         </MuiLink>
-
-        {app.nextStep && (
-          <>
-            <Divider sx={{ my: 1.5 }} />
-            <Stack direction="row" sx={{ justifyContent: "space-between", alignItems: "center", gap: 1 }}>
-              <Typography variant="body2" sx={{ color: "text.secondary" }}>
-                <Box component="span" sx={{ color: "text.primary", fontWeight: 600 }}>
-                  Next:
-                </Box>{" "}
-                {app.nextStep}
-              </Typography>
-              {app.nextStepDate && (
-                <SoftChip
-                  label={`${formatDate(app.nextStepDate)} · ${relativeDay(app.nextStepDate)}`}
-                  color={overdue ? "crimson" : dueSoon ? "gold" : "gray"}
-                />
-              )}
-            </Stack>
-          </>
-        )}
       </CardContent>
     </Card>
   );

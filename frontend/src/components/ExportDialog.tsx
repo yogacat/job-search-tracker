@@ -15,7 +15,7 @@ import {
 import FileDownloadOutlinedIcon from "@mui/icons-material/FileDownloadOutlined";
 import { useStore } from "../store";
 import { formatDate, sentenceCase } from "../format";
-import type { JobApplication } from "../types";
+import { SOURCE_LABEL, type JobApplication } from "../types";
 
 // The Agentur für Arbeit export: one row per application. These are the exact columns the
 // generated .xlsx will carry — the real file is produced by the backend (Apache POI). This
@@ -28,7 +28,7 @@ function row(app: JobApplication): string[] {
     formatDate(app.appliedDate),
     app.company,
     app.role,
-    app.source,
+    SOURCE_LABEL[app.source],
     sentenceCase(app.status),
     app.postingUrl ?? "",
   ];

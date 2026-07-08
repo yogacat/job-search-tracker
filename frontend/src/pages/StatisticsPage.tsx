@@ -23,7 +23,9 @@ export function StatisticsPage() {
 
   const { total, interviewRate, offerRate } = useMemo(() => {
     const by = (s: ApplicationStatus) => applications.filter((a) => a.status === s).length;
-    const reachedInterview = applications.filter((a) => a.events.some((e) => e.type === "INTERVIEW")).length;
+    const reachedInterview = applications.filter((a) =>
+      a.events.some((e) => e.type === "INTERVIEW" || e.type === "TECHNICAL_INTERVIEW"),
+    ).length;
     const t = applications.length;
     return {
       total: t,

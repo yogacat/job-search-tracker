@@ -16,8 +16,8 @@ import { sentenceCase } from "../format";
 const EVENT_TYPES: EventType[] = [
   "APPLIED",
   "FOLLOW_UP",
-  "SCREENING_CALL",
   "INTERVIEW",
+  "TECHNICAL_INTERVIEW",
   "TASK",
   "OFFER",
   "REJECTED",
@@ -33,13 +33,19 @@ export function AddEventDialog({ appId, open, onClose }: { appId: string; open: 
   const [type, setType] = useState<EventType>("INTERVIEW");
   const [date, setDate] = useState(today());
   const [note, setNote] = useState("");
+  const [saving, setSaving] = useState(false);
 
-  const save = () => {
-    addEvent(appId, { type, date, note: note.trim() || undefined });
-    setType("INTERVIEW");
-    setDate(today());
-    setNote("");
-    onClose();
+  const save = async () => {
+    setSaving(true);
+    try {
+      await addEvent(appId, { type, date, note: note.trim() || undefined });
+      setType("INTERVIEW");
+      setDate(today());
+      setNote("");
+      onClose();
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -69,7 +75,7 @@ export function AddEventDialog({ appId, open, onClose }: { appId: string; open: 
         <Button onClick={onClose} color="inherit" sx={{ color: "text.secondary" }}>
           Cancel
         </Button>
-        <Button onClick={save} variant="contained">
+        <Button onClick={save} variant="contained" disabled={saving}>
           Add step
         </Button>
       </DialogActions>

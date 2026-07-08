@@ -38,7 +38,10 @@ export function SankeyChart({ nodes, links }: { nodes: FunnelNode[]; links: Funn
   const theme = useTheme();
   const mode = theme.palette.mode;
 
-  const graph = useMemo<SankeyGraph<FunnelNode, FunnelLink>>(() => {
+  const graph = useMemo<SankeyGraph<FunnelNode, FunnelLink> | null>(() => {
+    // d3-sankey throws ("Invalid array length") when given zero nodes, e.g. before any
+    // applications exist.
+    if (nodes.length === 0) return null;
     const generator = sankey<FunnelNode, FunnelLink>()
       .nodeWidth(13)
       .nodePadding(18)
@@ -55,6 +58,14 @@ export function SankeyChart({ nodes, links }: { nodes: FunnelNode[]; links: Funn
   }, [nodes, links]);
 
   const linkPath = sankeyLinkHorizontal<FunnelNode, FunnelLink>();
+
+  if (!graph) {
+    return (
+      <Box sx={{ width: "100%", py: 4, textAlign: "center", color: "text.secondary", fontSize: 14 }}>
+        No applications yet — add one to see the funnel.
+      </Box>
+    );
+  }
 
   return (
     <Box sx={{ width: "100%", overflow: "hidden" }}>

@@ -12,11 +12,14 @@ import {
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 import AddIcon from "@mui/icons-material/Add";
+import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import { Link, useParams } from "react-router-dom";
 import { useStore } from "../store";
 import { StatusChip, SoftChip, useEventColor } from "../chips";
 import { formatDate, sentenceCase } from "../format";
+import { SOURCE_LABEL } from "../types";
 import { AddEventDialog } from "../components/AddEventDialog";
+import { EditApplicationDialog } from "../components/EditApplicationDialog";
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
@@ -37,6 +40,7 @@ export function ApplicationDetailPage() {
   const { id } = useParams();
   const { applications } = useStore();
   const [addEventOpen, setAddEventOpen] = useState(false);
+  const [editOpen, setEditOpen] = useState(false);
   const eventColor = useEventColor();
   const app = applications.find((a) => a.id === id);
 
@@ -73,7 +77,12 @@ export function ApplicationDetailPage() {
                 {app.role}
               </Typography>
             </Box>
-            <StatusChip status={app.status} />
+            <Stack direction="row" spacing={1} sx={{ alignItems: "center" }}>
+              <StatusChip status={app.status} />
+              <Button size="small" startIcon={<EditOutlinedIcon />} onClick={() => setEditOpen(true)}>
+                Edit
+              </Button>
+            </Stack>
           </Stack>
 
           {app.postingUrl && (
@@ -97,11 +106,9 @@ export function ApplicationDetailPage() {
             }}
           >
             <Field label="Applied">{formatDate(app.appliedDate)}</Field>
-            <Field label="Source">{app.source}</Field>
+            <Field label="Source">{SOURCE_LABEL[app.source]}</Field>
             <Field label="Location">{app.location ?? "—"}</Field>
             <Field label="Salary range">{app.salaryRange ?? "—"}</Field>
-            <Field label="Contact">{app.contactPerson ?? "—"}</Field>
-            <Field label="Next step">{app.nextStep ? `${app.nextStep}${app.nextStepDate ? ` (${formatDate(app.nextStepDate)})` : ""}` : "—"}</Field>
           </Box>
 
           {app.notes && (
@@ -153,6 +160,7 @@ export function ApplicationDetailPage() {
       </Card>
 
       <AddEventDialog appId={app.id} open={addEventOpen} onClose={() => setAddEventOpen(false)} />
+      <EditApplicationDialog app={app} open={editOpen} onClose={() => setEditOpen(false)} />
     </>
   );
 }

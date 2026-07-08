@@ -45,7 +45,6 @@ export function dot(mode: PaletteMode, key: DotKey): string {
 // Status → dot color. Pipeline warms as it advances; terminal states go neutral gray.
 export const STATUS_DOT: Record<ApplicationStatus, DotKey> = {
   APPLIED: "blue",
-  SCREENING: "salmon",
   INTERVIEW: "gold",
   OFFER: "olive",
   ACCEPTED: "oliveDeep",
@@ -57,8 +56,8 @@ export const STATUS_DOT: Record<ApplicationStatus, DotKey> = {
 export const EVENT_DOT: Record<EventType, DotKey> = {
   APPLIED: "blue",
   FOLLOW_UP: "gray",
-  SCREENING_CALL: "salmon",
   INTERVIEW: "gold",
+  TECHNICAL_INTERVIEW: "salmon",
   TASK: "coral",
   OFFER: "olive",
   REJECTED: "gray",

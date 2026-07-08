@@ -22,6 +22,21 @@ export function relativeDay(iso: string): string {
   return d > 0 ? `in ${d} days` : `${-d} days ago`;
 }
 
+const NUMBER_FORMAT = new Intl.NumberFormat("de-DE");
+
+/** "70,000–80,000 €/yr", "80,000 €/mo", or undefined if neither bound is set. */
+export function formatSalaryRange(
+  min: number | undefined,
+  max: number | undefined,
+  period: "YEAR" | "MONTH" | undefined,
+): string | undefined {
+  if (min == null && max == null) return undefined;
+  const range = min != null && max != null && min !== max
+    ? `${NUMBER_FORMAT.format(min)}–${NUMBER_FORMAT.format(max)} €`
+    : `${NUMBER_FORMAT.format((min ?? max)!)} €`;
+  return period ? `${range}/${period === "YEAR" ? "yr" : "mo"}` : range;
+}
+
 function sentenceCase(value: string): string {
   const lower = value.replaceAll("_", " ").toLowerCase();
   return lower.charAt(0).toUpperCase() + lower.slice(1);

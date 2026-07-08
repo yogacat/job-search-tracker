@@ -1,6 +1,5 @@
 import { useState } from "react";
 import {
-  Autocomplete,
   Box,
   Button,
   Dialog,
@@ -10,11 +9,21 @@ import {
   MenuItem,
   Stack,
   TextField,
+  Typography,
 } from "@mui/material";
 import { useStore } from "../store";
-import { SOURCE_LABEL, type SalaryPeriod, type Source, type WorkMode } from "../types";
+import {
+  SOURCE_LABEL,
+  STATUS_LABEL,
+  type ApplicationStatus,
+  type JobApplication,
+  type SalaryPeriod,
+  type Source,
+  type WorkMode,
+} from "../types";
 
 const SOURCES = Object.entries(SOURCE_LABEL) as [Source, string][];
+const STATUSES = Object.entries(STATUS_LABEL) as [ApplicationStatus, string][];
 const WORK_MODES: { value: WorkMode; label: string }[] = [
   { value: "REMOTE", label: "Remote" },
   { value: "HYBRID", label: "Hybrid" },
@@ -25,55 +34,48 @@ const SALARY_PERIODS: { value: SalaryPeriod; label: string }[] = [
   { value: "MONTH", label: "per month" },
 ];
 
-function today(): string {
-  return new Date().toISOString().slice(0, 10);
-}
-
-export function AddApplicationDialog({ open, onClose }: { open: boolean; onClose: () => void }) {
-  const { companies, addApplication } = useStore();
-  const [company, setCompany] = useState("");
-  const [role, setRole] = useState("");
-  const [postingUrl, setPostingUrl] = useState("");
-  const [source, setSource] = useState<Source>("LINKEDIN");
-  const [appliedDate, setAppliedDate] = useState(today());
-  const [location, setLocation] = useState("");
-  const [workMode, setWorkMode] = useState<WorkMode>("HYBRID");
-  const [salaryMin, setSalaryMin] = useState("");
-  const [salaryMax, setSalaryMax] = useState("");
-  const [salaryPeriod, setSalaryPeriod] = useState<SalaryPeriod>("YEAR");
+export function EditApplicationDialog({
+  app,
+  open,
+  onClose,
+}: {
+  app: JobApplication;
+  open: boolean;
+  onClose: () => void;
+}) {
+  const { updateApplication } = useStore();
+  const [role, setRole] = useState(app.role);
+  const [postingUrl, setPostingUrl] = useState(app.postingUrl ?? "");
+  const [source, setSource] = useState<Source>(app.source);
+  const [appliedDate, setAppliedDate] = useState(app.appliedDate);
+  const [location, setLocation] = useState(app.location ?? "");
+  const [workMode, setWorkMode] = useState<WorkMode | "">(app.workMode ?? "");
+  const [salaryMin, setSalaryMin] = useState(app.salaryMin != null ? String(app.salaryMin) : "");
+  const [salaryMax, setSalaryMax] = useState(app.salaryMax != null ? String(app.salaryMax) : "");
+  const [salaryPeriod, setSalaryPeriod] = useState<SalaryPeriod>(app.salaryPeriod ?? "YEAR");
+  const [status, setStatus] = useState<ApplicationStatus>(app.status);
+  const [notes, setNotes] = useState(app.notes ?? "");
   const [saving, setSaving] = useState(false);
 
-  const canSave = company.trim() !== "" && role.trim() !== "" && !saving;
-
-  const reset = () => {
-    setCompany("");
-    setRole("");
-    setPostingUrl("");
-    setSource("LINKEDIN");
-    setAppliedDate(today());
-    setLocation("");
-    setWorkMode("HYBRID");
-    setSalaryMin("");
-    setSalaryMax("");
-    setSalaryPeriod("YEAR");
-  };
+  const canSave = role.trim() !== "" && !saving;
 
   const save = async () => {
     setSaving(true);
     try {
-      await addApplication({
-        companyName: company.trim(),
+      await updateApplication(app.id, {
+        companyId: app.companyId,
         role: role.trim(),
         postingUrl: postingUrl.trim() || undefined,
+        location: location.trim() || undefined,
+        workMode: workMode || undefined,
         source,
         appliedDate,
-        location: location.trim() || undefined,
-        workMode,
         salaryMin: salaryMin ? Number(salaryMin) : undefined,
         salaryMax: salaryMax ? Number(salaryMax) : undefined,
         salaryPeriod: salaryMin || salaryMax ? salaryPeriod : undefined,
+        status,
+        notes: notes.trim() || undefined,
       });
-      reset();
       onClose();
     } finally {
       setSaving(false);
@@ -82,18 +84,21 @@ export function AddApplicationDialog({ open, onClose }: { open: boolean; onClose
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
-      <DialogTitle sx={{ fontWeight: 650 }}>Add application</DialogTitle>
+      <DialogTitle sx={{ fontWeight: 650 }}>Edit application</DialogTitle>
       <DialogContent>
         <Stack spacing={2} sx={{ mt: 0.5 }}>
-          <Autocomplete
-            freeSolo
-            options={companies.map((c) => c.name)}
-            inputValue={company}
-            onInputChange={(_, value) => setCompany(value)}
-            renderInput={(params) => <TextField {...params} label="Company" size="small" autoFocus required />}
-          />
-          <TextField label="Role / position" value={role} onChange={(e) => setRole(e.target.value)} size="small" required />
+          <Typography variant="body2" sx={{ color: "text.secondary" }}>
+            {app.company}
+          </Typography>
+          <TextField label="Role / position" value={role} onChange={(e) => setRole(e.target.value)} size="small" autoFocus required />
           <TextField label="Job posting link" value={postingUrl} onChange={(e) => setPostingUrl(e.target.value)} size="small" placeholder="https://…" />
+          <TextField label="Status" value={status} onChange={(e) => setStatus(e.target.value as ApplicationStatus)} size="small" select>
+            {STATUSES.map(([value, label]) => (
+              <MenuItem key={value} value={value}>
+                {label}
+              </MenuItem>
+            ))}
+          </TextField>
           <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" }, gap: 2 }}>
             <TextField label="Source (Art der Bewerbung)" value={source} onChange={(e) => setSource(e.target.value as Source)} size="small" select>
               {SOURCES.map(([value, label]) => (
@@ -120,8 +125,8 @@ export function AddApplicationDialog({ open, onClose }: { open: boolean; onClose
             </TextField>
           </Box>
           <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 2 }}>
-            <TextField label="Salary min (optional)" value={salaryMin} onChange={(e) => setSalaryMin(e.target.value)} size="small" type="number" placeholder="70000" />
-            <TextField label="Salary max (optional)" value={salaryMax} onChange={(e) => setSalaryMax(e.target.value)} size="small" type="number" placeholder="80000" />
+            <TextField label="Salary min (optional)" value={salaryMin} onChange={(e) => setSalaryMin(e.target.value)} size="small" type="number" />
+            <TextField label="Salary max (optional)" value={salaryMax} onChange={(e) => setSalaryMax(e.target.value)} size="small" type="number" />
             <TextField label="Period" value={salaryPeriod} onChange={(e) => setSalaryPeriod(e.target.value as SalaryPeriod)} size="small" select>
               {SALARY_PERIODS.map((p) => (
                 <MenuItem key={p.value} value={p.value}>
@@ -130,6 +135,7 @@ export function AddApplicationDialog({ open, onClose }: { open: boolean; onClose
               ))}
             </TextField>
           </Box>
+          <TextField label="Notes (optional)" value={notes} onChange={(e) => setNotes(e.target.value)} size="small" multiline minRows={2} />
         </Stack>
       </DialogContent>
       <DialogActions sx={{ px: 3, pb: 2 }}>
@@ -137,7 +143,7 @@ export function AddApplicationDialog({ open, onClose }: { open: boolean; onClose
           Cancel
         </Button>
         <Button onClick={save} variant="contained" disabled={!canSave}>
-          Add application
+          Save changes
         </Button>
       </DialogActions>
     </Dialog>
