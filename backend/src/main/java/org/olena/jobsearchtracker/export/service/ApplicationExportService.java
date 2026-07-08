@@ -59,7 +59,7 @@ public class ApplicationExportService {
     }
 
     private void writeNewApplicationsSheet(XSSFWorkbook workbook, CellStyle headerStyle, List<Application> applications) {
-        String[] columns = {"Datum", "Firma", "Position", "Art der Bewerbung", "Status / Ergebnis", "Link"};
+        String[] columns = {"Datum", "Firma", "Position", "Status / Ergebnis"};
         Sheet sheet = workbook.createSheet("Neue Bewerbungen");
         writeHeader(sheet, headerStyle, columns);
 
@@ -69,9 +69,7 @@ public class ApplicationExportService {
             row.createCell(0).setCellValue(app.getAppliedOn().format(DATE_FMT));
             row.createCell(1).setCellValue(app.getCompany().getName());
             row.createCell(2).setCellValue(app.getRoleTitle());
-            row.createCell(3).setCellValue(sentenceCase(app.getSource().name()));
-            row.createCell(4).setCellValue(sentenceCase(app.getCurrentStatus().name()));
-            row.createCell(5).setCellValue(app.getPostingUrl() != null ? app.getPostingUrl() : "");
+            row.createCell(3).setCellValue(sentenceCase(app.getCurrentStatus().name()));
         }
         autoSizeColumns(sheet, columns.length);
     }
