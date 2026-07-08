@@ -19,7 +19,7 @@ import FileDownloadOutlinedIcon from "@mui/icons-material/FileDownloadOutlined";
 import { useStore } from "../store";
 import { exportUrl } from "../api";
 import { formatDate, sentenceCase } from "../format";
-import { SOURCE_LABEL, type ApplicationEvent, type JobApplication } from "../types";
+import type { ApplicationEvent, JobApplication } from "../types";
 
 // The Agentur für Arbeit export covers a date range (from/to) — the report is submitted roughly
 // every two months. It carries two groups of rows, mirroring the two sheets the backend (Apache
@@ -27,7 +27,7 @@ import { SOURCE_LABEL, type ApplicationEvent, type JobApplication } from "../typ
 // submitted before the range, so a caseworker can see both new effort and how earlier
 // applications turned out.
 
-const NEW_COLUMNS = ["Datum", "Firma", "Position", "Art der Bewerbung", "Status / Ergebnis", "Link"] as const;
+const NEW_COLUMNS = ["Datum", "Firma", "Position", "Status / Ergebnis"] as const;
 const UPDATE_COLUMNS = ["Datum der Änderung", "Firma", "Position", "Beworben am", "Neuer Status", "Notiz"] as const;
 
 interface UpdateRow {
@@ -36,14 +36,7 @@ interface UpdateRow {
 }
 
 function newApplicationRow(app: JobApplication): string[] {
-  return [
-    formatDate(app.appliedDate),
-    app.company,
-    app.role,
-    SOURCE_LABEL[app.source],
-    sentenceCase(app.status),
-    app.postingUrl ?? "",
-  ];
+  return [formatDate(app.appliedDate), app.company, app.role, sentenceCase(app.status)];
 }
 
 function updateRow({ app, event }: UpdateRow): string[] {
