@@ -121,3 +121,9 @@ export function createEvent(applicationId: number, req: CreateApplicationEventRe
 export function deleteEvent(applicationId: number, eventId: number): Promise<void> {
   return request(`/applications/${applicationId}/events/${eventId}`, { method: "DELETE" });
 }
+
+// Builds the download URL for the periodic Agentur für Arbeit report (export/controller/ExportController).
+// A plain <a href> is enough — the backend sends Content-Disposition: attachment.
+export function exportUrl(from: string, to: string): string {
+  return `${BASE}/export?from=${from}&to=${to}`;
+}
