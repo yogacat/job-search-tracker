@@ -95,7 +95,16 @@ export function SankeyChart({ nodes, links }: { nodes: FunnelNode[]; links: Funn
             const color = categoryColor(mode, n.category);
             return (
               <g key={i}>
-                <rect x={x0} y={y0} width={x1 - x0} height={Math.max(1, y1 - y0)} fill={color} rx={1.5} />
+                <rect
+                  x={x0}
+                  y={y0}
+                  width={x1 - x0}
+                  height={Math.max(1, y1 - y0)}
+                  fill={color}
+                  rx={1.5}
+                  stroke={theme.palette.background.paper}
+                  strokeWidth={2}
+                />
                 <text
                   x={leftHalf ? x1 + 7 : x0 - 7}
                   y={(y0 + y1) / 2}
