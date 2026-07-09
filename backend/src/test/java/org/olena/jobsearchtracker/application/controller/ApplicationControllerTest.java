@@ -21,6 +21,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
+import static org.hamcrest.Matchers.containsString;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
@@ -155,10 +156,36 @@ class ApplicationControllerTest {
                 .andExpect(jsonPath("$.appliedOn").value("2026-07-01"));
     }
 
+    @Test
+    void testCreate_returnsBadRequest_whenRoleTitleBlank() throws Exception {
+        CreateApplicationRequest request = new CreateApplicationRequest(
+                1L,
+                "",
+                "https://acme.example.com/careers/123",
+                "Remote",
+                WorkMode.REMOTE,
+                Source.REFERRAL,
+                LocalDate.of(2026, 7, 1),
+                new BigDecimal("90000.00"),
+                new BigDecimal("110000.00"),
+                SalaryPeriod.YEAR,
+                "Referred by a friend");
+
+        mockMvc.perform(
+                        post("/api/applications")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request))
+                )
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value(containsString("roleTitle")));
+
+        verifyNoInteractions(service);
+    }
+
     private UpdateApplicationRequest updateApplicationRequest() {
         return new UpdateApplicationRequest(
                 1L,
-                "https://acme.example.com/careers/123",
+                "Senior Software Engineer",
                 "https://acme.example.com/careers/123",
                 "Remote",
                 WorkMode.REMOTE,
