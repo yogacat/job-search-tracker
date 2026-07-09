@@ -48,3 +48,10 @@ docker compose up -d jobsearch-postgres   # Postgres only, published at localhos
 cd backend
 ./mvnw spring-boot:run
 ```
+
+## License
+
+[Individual Noncommercial Use License](LICENSE) (adapted from PolyForm Noncommercial 1.0.0) —
+free for an individual to run and modify for personal, noncommercial purposes. No company,
+organization, or other legal entity may use it under any circumstance, and no commercial use
+or resale.
