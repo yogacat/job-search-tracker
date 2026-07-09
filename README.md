@@ -7,34 +7,24 @@ task, offer, rejection), and what's next — then export a one-row-per-applicati
 Single-user, self-hosted, same shape as the Zalando Pipeline app (Spring Boot backend +
 React/MUI frontend). The backend is written separately.
 
-## Frontend (UI mock)
+<p>
+  <img src="docs/screenshots/applications.png" width="32%" alt="Applications list" />
+  <img src="docs/screenshots/application-detail.png" width="32%" alt="Application detail with timeline" />
+  <img src="docs/screenshots/statistics.png" width="32%" alt="Statistics funnel" />
+</p>
 
-MUI mock wired to in-memory seed data — no backend required. It reuses the Zalando app's
-design system (teal accent, quiet status dots, 3px left accent bar, Inter + tabular numerals).
-
-```bash
-cd frontend
-npm install
-npm run dev        # http://localhost:5174
-```
-
-### What the mock shows
-- **Applications** — list with summary stats (total / active / interviews / offers / closed),
-  a left accent bar that flags offers (green), due-soon next steps (orange) and overdue (red),
-  and closed applications (gray). Add applications via the dialog.
-- **Application detail** — all fields plus a dated **timeline** ("steps I had there"); add steps.
-- **Statistics** — status funnel with interview-rate / offer-rate metrics.
-- **Export .xlsx** (top-right) — previews the exact Agentur-für-Arbeit sheet
-  (`Datum | Firma | Position | Art der Bewerbung | Status/Ergebnis | Link`) and downloads a CSV
-  stand-in. The real backend streams a formatted `.xlsx` via Apache POI.
+(Sample data shown — not real applications.)
 
 ## Running the backend
 
 The backend is a Spring Boot app (Java 26) backed by Postgres, with schema migrations via Flyway.
+The frontend talks to it over `/api` and won't do much without it running — start this first.
 
-Start Postgres + backend together with Docker Compose:
+Copy `.env.example` to `.env` and fill in real values, then start Postgres + backend together
+with Docker Compose:
 
 ```bash
+cp .env.example .env
 docker compose up -d
 ```
 
@@ -48,6 +38,39 @@ docker compose up -d jobsearch-postgres   # Postgres only, published at localhos
 cd backend
 ./mvnw spring-boot:run
 ```
+
+### Testing
+
+```bash
+cd backend
+./mvnw test
+```
+
+Covers controllers (`@WebMvcTest`), services (plain Mockito unit tests), and repositories
+(`@DataJpaTest` against an in-memory H2 database — schema is Hibernate-generated for the test
+slice, not Flyway, since H2 can't run the Postgres-specific migration SQL verbatim).
+
+## Frontend
+
+React/MUI app that talks to the real backend via `/api` (the Vite dev server proxies it to
+`http://localhost:8081` — see `frontend/vite.config.ts`). It reuses the Zalando app's design
+system (teal accent, quiet status dots, 3px left accent bar, Inter + tabular numerals).
+
+```bash
+cd frontend
+npm install
+npm run dev        # http://localhost:5174
+```
+
+### What it does
+- **Applications** — list with summary stats (total / active / interviews / offers / closed),
+  a left accent bar that flags offers (green), due-soon next steps (orange) and overdue (red),
+  and closed applications (gray). Add applications via the dialog.
+- **Application detail** — all fields plus a dated **timeline** ("steps I had there"); add steps.
+- **Statistics** — status funnel with interview-rate / offer-rate metrics.
+- **Export .xlsx** (top-right) — downloads the Agentur-für-Arbeit sheet
+  (`Datum | Firma | Position | Art der Bewerbung | Status/Ergebnis | Link`) as a real `.xlsx`,
+  streamed by the backend via Apache POI.
 
 ## License
 
