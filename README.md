@@ -1,5 +1,9 @@
 # Job Search Tracker
 
+[![CI](https://github.com/yogacat/job-search-tracker/actions/workflows/ci.yml/badge.svg)](https://github.com/yogacat/job-search-tracker/actions/workflows/ci.yml)
+[![CodeQL](https://github.com/yogacat/job-search-tracker/actions/workflows/codeql.yml/badge.svg)](https://github.com/yogacat/job-search-tracker/actions/workflows/codeql.yml)
+[![License](https://img.shields.io/badge/license-Individual%20Noncommercial-blue)](LICENSE)
+
 Track roles you're applying to — status, the steps at each company (screening, interview,
 task, offer, rejection), and what's next — then export a one-row-per-application list for the
 **Agentur für Arbeit** as proof of your Eigenbemühungen.
