@@ -12,7 +12,7 @@
 
     <groupId>org.olena</groupId>
     <artifactId>job-search-tracker</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.1.0</version>
     <name>job-search-tracker</name>
     <description>job-search-tracker</description>
 

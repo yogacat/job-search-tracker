@@ -21,6 +21,7 @@ server:
   servlet:
     session:
       cookie:
-        # Defense-in-depth alongside CSRF tokens; Lax (not Strict) so the session survives
-        # following a link into the app from elsewhere.
+        # Hardening default for any servlet session cookie; Lax (not Strict) so the session
+        # survives following a link into the app from elsewhere. (The app has no login yet — see
+        # the security note in the README.)
         same-site: lax

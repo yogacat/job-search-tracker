@@ -19,6 +19,5 @@ FROM eclipse-temurin:26-jre
 WORKDIR /app
 COPY --from=backend-build /app/backend/target/*.jar app.jar
 EXPOSE 8081
-# CMD (not ENTRYPOINT) so `docker compose run backend <other command>` can fully replace it,
-# e.g. to run PasswordHashGeneratorMain — see .env.example.
+# CMD (not ENTRYPOINT) so `docker compose run backend <other command>` can fully replace it.
 CMD ["java", "-jar", "app.jar"]
