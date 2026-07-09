@@ -38,11 +38,11 @@ export function StatisticsPage() {
     <>
       <Typography variant="h5">Statistics</Typography>
 
-      <Stack direction="row" spacing={2} sx={{ flexWrap: "wrap" }}>
+      <Box sx={{ display: "grid", gridTemplateColumns: "repeat(3, minmax(0, 1fr))", gap: 2 }}>
         <Metric label="Total applications" value={String(total)} />
         <Metric label="Interview rate" value={`${interviewRate}%`} />
         <Metric label="Offer rate" value={`${offerRate}%`} />
-      </Stack>
+      </Box>
 
       <Card>
         <CardContent sx={{ px: { xs: 1.5, sm: 3 }, py: 2.5 }}>
@@ -71,8 +71,8 @@ export function StatisticsPage() {
 
 function Metric({ label, value }: { label: string; value: string }) {
   return (
-    <Card sx={{ flex: 1, minWidth: 150 }}>
-      <CardContent sx={{ px: 2.5, py: 2, "&:last-child": { pb: 2 } }}>
+    <Card>
+      <CardContent sx={{ px: { xs: 1.5, sm: 2.5 }, py: 2, "&:last-child": { pb: 2 } }}>
         <Typography sx={{ fontWeight: 700, fontSize: 26, fontVariantNumeric: "tabular-nums" }}>{value}</Typography>
         <Typography variant="caption" sx={{ color: "text.secondary" }}>
           {label}

@@ -124,10 +124,17 @@ export function EditApplicationDialog({
               ))}
             </TextField>
           </Box>
-          <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 2 }}>
+          <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr 1fr", sm: "1fr 1fr 1fr" }, gap: 2 }}>
             <TextField label="Salary min (optional)" value={salaryMin} onChange={(e) => setSalaryMin(e.target.value)} size="small" type="number" />
             <TextField label="Salary max (optional)" value={salaryMax} onChange={(e) => setSalaryMax(e.target.value)} size="small" type="number" />
-            <TextField label="Period" value={salaryPeriod} onChange={(e) => setSalaryPeriod(e.target.value as SalaryPeriod)} size="small" select>
+            <TextField
+              label="Period"
+              value={salaryPeriod}
+              onChange={(e) => setSalaryPeriod(e.target.value as SalaryPeriod)}
+              size="small"
+              select
+              sx={{ gridColumn: { xs: "1 / -1", sm: "auto" } }}
+            >
               {SALARY_PERIODS.map((p) => (
                 <MenuItem key={p.value} value={p.value}>
                   {p.label}
