@@ -6,6 +6,12 @@
       "runtimeExecutable": "npm",
       "runtimeArgs": ["run", "dev", "--prefix", "frontend"],
       "port": 5174
+    },
+    {
+      "name": "spoon-sprints",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev", "--prefix", "/Users/olena/IdeaProjects/spoon-sprints/frontend"],
+      "port": 5175
     }
   ]
 }
