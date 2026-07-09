@@ -8,6 +8,7 @@ import org.olena.jobsearchtracker.company.repository.Company;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
+@ToString
 @Getter
 @Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
