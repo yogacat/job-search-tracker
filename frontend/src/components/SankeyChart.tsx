@@ -68,8 +68,17 @@ export function SankeyChart({ nodes, links }: { nodes: FunnelNode[]; links: Funn
   }
 
   return (
-    <Box sx={{ width: "100%", overflow: "hidden" }}>
-      <svg viewBox={`0 0 ${WIDTH} ${HEIGHT}`} width="100%" preserveAspectRatio="xMinYMin meet" role="img" aria-label="Application funnel">
+    <Box sx={{ width: "100%", overflowX: "auto", overflowY: "hidden" }}>
+      {/* Below ~520px rendered width the node labels shrink past legibility, so floor the
+          width and let the container scroll horizontally instead of squeezing the text. */}
+      <svg
+        viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
+        width="100%"
+        preserveAspectRatio="xMinYMin meet"
+        role="img"
+        aria-label="Application funnel"
+        style={{ display: "block", minWidth: 520 }}
+      >
         <g fill="none">
           {graph.links.map((link, i) => {
             const target = link.target as SNode;
