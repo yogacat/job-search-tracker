@@ -20,6 +20,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
+import static org.hamcrest.Matchers.containsString;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
@@ -112,6 +113,21 @@ class ApplicationEventControllerTest {
                 .andExpect(jsonPath("$.occurredOn").value("2026-07-01"))
                 .andExpect(jsonPath("$.type").value("APPLIED"))
                 .andExpect(jsonPath("$.note").value("Sent an application"));
+    }
+
+    @Test
+    void testCreate_returnsBadRequest_whenOccurredOnMissing() throws Exception {
+        CreateApplicationEventRequest request = new CreateApplicationEventRequest(null, EventType.APPLIED, "Sent an application");
+
+        mockMvc.perform(
+                        post("/api/applications/1/events")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request))
+                )
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value(containsString("occurredOn")));
+
+        verifyNoInteractions(service);
     }
 
     @Test

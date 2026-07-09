@@ -11,6 +11,7 @@ import org.olena.jobsearchtracker.company.repository.Company;
 import org.olena.jobsearchtracker.company.service.CompanyService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -18,6 +19,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
 
+import static org.hamcrest.Matchers.containsString;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
@@ -97,6 +99,35 @@ class CompanyControllerTest {
                 .andExpect(jsonPath("$.name").value("Acme Corp"));
     }
 
+    @Test
+    void testCreate_returnsBadRequest_whenNameBlank() throws Exception {
+        CreateCompanyRequest request = new CreateCompanyRequest("", "https://acme.example.com", "Berlin", null);
+
+        mockMvc.perform(
+                        post("/api/companies")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request))
+                )
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value(containsString("name")));
+
+        verifyNoInteractions(service);
+    }
+
+    @Test
+    void testCreate_returnsConflict_whenNameAlreadyExists() throws Exception {
+        CreateCompanyRequest request = createCompanyRequest();
+        when(service.create(any())).thenThrow(new DataIntegrityViolationException("duplicate key value violates unique constraint"));
+
+        mockMvc.perform(
+                        post("/api/companies")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request))
+                )
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.message").value("That name is already in use."));
+    }
+
     private UpdateCompanyRequest updateCompanyRequest() {
         return new UpdateCompanyRequest(
                 "Acme Corp",
@@ -134,6 +165,35 @@ class CompanyControllerTest {
                                 .content(objectMapper.writeValueAsString(request))
                 )
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void testUpdate_returnsBadRequest_whenNameBlank() throws Exception {
+        UpdateCompanyRequest request = new UpdateCompanyRequest("", "https://acme.example.com", "Berlin", null);
+
+        mockMvc.perform(
+                        put("/api/companies/42")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request))
+                )
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value(containsString("name")));
+
+        verifyNoInteractions(service);
+    }
+
+    @Test
+    void testUpdate_returnsConflict_whenNameAlreadyExists() throws Exception {
+        UpdateCompanyRequest request = updateCompanyRequest();
+        when(service.update(anyLong(), any())).thenThrow(new DataIntegrityViolationException("duplicate key value violates unique constraint"));
+
+        mockMvc.perform(
+                        put("/api/companies/42")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request))
+                )
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.message").value("That name is already in use."));
     }
 
     @Test
