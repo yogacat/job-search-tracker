@@ -23,7 +23,17 @@ function Stat({ label, value }: { label: string; value: number }) {
   return (
     <Box sx={{ textAlign: "center" }}>
       <Typography sx={{ fontWeight: 650, fontSize: 20, fontVariantNumeric: "tabular-nums" }}>{value}</Typography>
-      <Typography variant="caption" sx={{ color: "text.secondary", letterSpacing: "0.05em", fontWeight: 600 }}>
+      <Typography
+        variant="caption"
+        sx={{
+          color: "text.secondary",
+          letterSpacing: { xs: 0, sm: "0.05em" },
+          fontWeight: 600,
+          fontSize: { xs: 9, sm: "0.75rem" },
+          whiteSpace: "nowrap",
+          display: "block",
+        }}
+      >
         {label.toUpperCase()}
       </Typography>
     </Box>
@@ -75,7 +85,7 @@ export function ApplicationsPage() {
 
       <Card>
         <CardContent sx={{ py: 1.5, "&:last-child": { pb: 1.5 } }}>
-          <Box sx={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 1 }}>
+          <Box sx={{ display: "grid", gridTemplateColumns: "repeat(5, minmax(0, 1fr))", gap: { xs: 0.5, sm: 1 } }}>
             <Stat label="Total" value={stats.total} />
             <Stat label="Active" value={stats.active} />
             <Stat label="Interviews" value={stats.interviews} />

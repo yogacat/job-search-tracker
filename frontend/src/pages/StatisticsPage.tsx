@@ -38,7 +38,7 @@ export function StatisticsPage() {
     <>
       <Typography variant="h5">Statistics</Typography>
 
-      <Box sx={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 2 }}>
+      <Box sx={{ display: "grid", gridTemplateColumns: "repeat(3, minmax(0, 1fr))", gap: 2 }}>
         <Metric label="Total applications" value={String(total)} />
         <Metric label="Interview rate" value={`${interviewRate}%`} />
         <Metric label="Offer rate" value={`${offerRate}%`} />
