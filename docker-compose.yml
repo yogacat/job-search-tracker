@@ -14,7 +14,7 @@ services:
       retries: 10
     # Loopback-only, non-default host port: lets a local IDE connect directly for
     # inspection/debugging without exposing the DB on the LAN/Tailscale the way the backend's
-    # 0.0.0.0:8080 is exposed. 5434 (not 5432) because this machine already runs a native Postgres
+    # 0.0.0.0:8081 is exposed. 5434 (not 5432) because this machine already runs a native Postgres
     # on the default port, and the Zalando app's container takes 5433.
     ports:
       - "127.0.0.1:5434:5432"

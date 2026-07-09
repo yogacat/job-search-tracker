@@ -11,6 +11,10 @@ task, offer, rejection), and what's next — then export a one-row-per-applicati
 Single-user, self-hosted, same shape as the Zalando Pipeline app (Spring Boot backend +
 React/MUI frontend). The backend is written separately.
 
+> **Security note:** there is no authentication — this is built to run on your own machine or a
+> private network (e.g. behind Tailscale), not on the public internet. Compose publishes the
+> backend on `0.0.0.0:8081`; don't expose that port publicly. Postgres is bound to loopback only.
+
 <p>
   <img src="docs/screenshots/applications.png" width="32%" alt="Applications list" />
   <img src="docs/screenshots/application-detail.png" width="32%" alt="Application detail with timeline" />
