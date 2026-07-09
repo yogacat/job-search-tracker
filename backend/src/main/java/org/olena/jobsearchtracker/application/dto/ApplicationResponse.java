@@ -1,10 +1,6 @@
 package org.olena.jobsearchtracker.application.dto;
 
-import org.olena.jobsearchtracker.application.repository.Application;
-import org.olena.jobsearchtracker.application.repository.CurrentStatus;
-import org.olena.jobsearchtracker.application.repository.SalaryPeriod;
-import org.olena.jobsearchtracker.application.repository.Source;
-import org.olena.jobsearchtracker.application.repository.WorkMode;
+import org.olena.jobsearchtracker.application.repository.*;
 import org.olena.jobsearchtracker.company.dto.CompanyResponse;
 
 import java.math.BigDecimal;

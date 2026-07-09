@@ -2,11 +2,7 @@ package org.olena.jobsearchtracker.export.service;
 
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.olena.jobsearchtracker.application.repository.Application;
-import org.olena.jobsearchtracker.application.repository.ApplicationEvent;
-import org.olena.jobsearchtracker.application.repository.ApplicationEventRepository;
-import org.olena.jobsearchtracker.application.repository.ApplicationRepository;
-import org.olena.jobsearchtracker.application.repository.EventType;
+import org.olena.jobsearchtracker.application.repository.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
